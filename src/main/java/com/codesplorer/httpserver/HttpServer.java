@@ -1,54 +1,36 @@
 package com.codesplorer.httpserver;
 
-
-
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.ServerSocket;
-import java.net.Socket;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.codesplorer.httpserver.config.Configuration;
 import com.codesplorer.httpserver.config.ConfigurationManager;
+import com.codesplorer.httpserver.core.ServerListenerThread;
 
 public class HttpServer {
+	
+	private final static Logger LOGGER=LoggerFactory.getLogger(HttpServer.class);
 public static void main(String[] args) {
-	System.out.println("Server Starting...");
+
+	LOGGER.info("Server starting...");
 	
 	ConfigurationManager.getInstance().loadConfigurationFile("src/main/resources/http.json");
     Configuration conf=ConfigurationManager.getInstance().getCurrentConfiguration();
     
-    System.out.println("Using Port: "+conf.getPort());
-    System.out.println("Using WebRoot: "+conf.getWebroot());
+    LOGGER.info("Using Port: "+conf.getPort());
     
+    LOGGER.info("Using WebRoot: "+conf.getWebroot());
     
     try {
-		ServerSocket serverSocket=new ServerSocket(conf.getPort());
-		Socket socket=serverSocket.accept();
-		
-		InputStream inputStream=socket.getInputStream();
-		OutputStream outputStream=socket.getOutputStream();
-		
-		String html="<html><head><title>Http Server</title></head><body><h1>Http Server in Java</h1></body></html>";
-		
-		
-		final String CRLF="\n\r";
-		
-		String response=
-				"HTTP/1.1 200 OK"+CRLF+ "Content-Length:"+html.getBytes().length+CRLF+CRLF+html+CRLF+CRLF;
-		
-		outputStream.write(response.getBytes());
-		System.out.println("Executed this line");
-		
-		inputStream.close();
-		outputStream.close();
-		socket.close();
-		serverSocket.close();
-		
+		ServerListenerThread serverListenerThread = new ServerListenerThread(conf.getPort(), conf.getWebroot());
+		serverListenerThread.start();
 	} catch (IOException e) {
-		
 		e.printStackTrace();
 	}
-	
+    
+   
+    System.out.println("Executed this line in main");
 }
 }
