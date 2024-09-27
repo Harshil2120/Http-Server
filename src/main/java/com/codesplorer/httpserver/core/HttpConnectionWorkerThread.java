@@ -24,6 +24,12 @@ public class HttpConnectionWorkerThread extends Thread{
 			inputStream=socket.getInputStream();
 			outputStream=socket.getOutputStream();
 			
+			int _byte;
+			while((_byte=inputStream.read())>=0) {
+				System.out.print((char)_byte);
+			}
+		
+			
 			String html="<html><head><title>Http Server</title></head><body><h1>Http Server in Java</h1></body></html>";
 			
 			
